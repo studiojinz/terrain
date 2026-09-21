@@ -521,7 +521,7 @@ function startMode(modeId){
 function renderShell(){
 document.getElementById("app").innerHTML=`
 <main class="app"><header class="topbar"><div class="brand">TERRAIN</div><div class="round" id="roundText"></div><div class="hud-right"><div class="score">SCORE <strong id="scoreText">0</strong></div><button class="utility-btn compact about-game" data-info="how">HELP</button><button class="utility-btn compact" id="leaveGame">MODES</button></div></header>
-<section class="intro"><div class="eyebrow" id="category"></div><h1 id="clue"></h1><p>Study the landscape. Use the satellite view, then place your best guess on the world map.</p></section>
+<section class="intro"><div class="eyebrow" id="category"></div><h1 id="clue">WHERE IN THE WORLD IS THIS?</h1><p>No clues before you guess. Study the shapes, textures and surrounding landscape, then place your pin on the world map.</p></section>
 <section class="game-stage" id="stage"><div id="satellite" class="satellite-map"></div>
 <div id="guessPanel" class="guess-panel"><div class="guess-map-header"><div><div class="eyebrow">GUESS MAP</div><div class="guess-status" id="guessStatus">PLACE YOUR GUESS</div></div><button class="map-toggle" id="toggleMap">EXPAND MAP ↗</button></div><div id="guessMap" class="guess-map"></div><div class="guess-attribution"><a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></div><button class="submit map-submit disabled" id="submit" disabled>LOCK IN GUESS <span>→</span></button></div>
 <div class="bottom-left"><div class="tip"><span>01</span><b>STUDY THE LANDSCAPE</b></div><div class="tip"><span>02</span><b>DROP YOUR PIN ON THE GUESS MAP</b></div></div>
@@ -607,8 +607,8 @@ function renderRound(){
 const loc=game[round];guess=null;submitted=false;expanded=false;
 document.getElementById("roundText").textContent=`${activeMode.name} · ROUND ${String(round+1).padStart(2,"0")} / 06`;
 document.getElementById("scoreText").textContent=score.toLocaleString();
-document.getElementById("category").textContent=loc.category;
-document.getElementById("clue").textContent=loc.clue;
+document.getElementById("category").textContent=activeMode.name+" · NO CLUES";
+document.getElementById("clue").textContent="WHERE IN THE WORLD IS THIS?";
 document.getElementById("guessStatus").textContent="PLACE YOUR GUESS";
 document.getElementById("guessPanel").classList.remove("expanded");
 document.getElementById("toggleMap").textContent="EXPAND MAP ↗";
