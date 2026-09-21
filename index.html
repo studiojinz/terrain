@@ -18,6 +18,7 @@ body{min-width:320px}.topbar{height:64px;display:flex;align-items:center;justify
 .mode-screen{min-height:100vh;padding:56px;display:flex;align-items:center;justify-content:center}.mode-inner{width:min(1050px,100%)}.mode-inner h1{font-size:clamp(48px,8vw,96px);letter-spacing:-.06em;line-height:.9;margin:14px 0 18px}.mode-intro{max-width:680px;color:#aab3a6;line-height:1.6;margin-bottom:34px}.mode-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.mode-card{appearance:none;text-align:left;min-height:240px;padding:28px;border:1px solid rgba(238,241,231,.2);background:#0e1712;color:#eef1e7;cursor:pointer;display:flex;flex-direction:column;transition:.18s ease}.mode-card:hover,.mode-card:focus-visible{background:#18231b;border-color:#e9eddf;transform:translateY(-2px);outline:none}.mode-card h2{font-size:34px;margin:12px 0}.mode-card p{color:#aab3a6;line-height:1.55;margin:0 0 24px}.mode-meta{margin-top:auto;font-size:10px;letter-spacing:.12em;color:#f5c542;font-weight:800}.mode-card.disabled{opacity:.42;cursor:default}.mode-card.disabled:hover{transform:none;background:#0e1712;border-color:rgba(238,241,231,.2)}
 .intro{padding:28px 48px 20px;max-width:1200px}.eyebrow{font-size:10px;letter-spacing:.18em;font-weight:800;color:#9ba895}
 .intro h1{font-size:clamp(30px,4vw,58px);line-height:1.02;max-width:980px;margin:10px 0 12px;letter-spacing:-.04em}.intro p{color:#9ea79d;max-width:700px;margin:0;line-height:1.5}
+.clue-tools{display:flex;align-items:center;gap:14px;margin-top:16px}.clue-reveal{appearance:none;border:1px solid rgba(238,241,231,.28);background:transparent;color:#eef1e7;height:40px;padding:0 14px;font:inherit;font-size:9px;font-weight:800;letter-spacing:.12em;cursor:pointer}.clue-reveal:hover,.clue-reveal:focus-visible{background:#eef1e7;color:#11180f;outline:none}.clue-text{color:#f5c542!important;font-size:12px;max-width:650px!important}.clue-text[hidden]{display:none}
 .game-stage{position:relative;margin:0 48px 40px;height:calc(100vh - 190px);min-height:620px;border:1px solid rgba(238,241,231,.16);overflow:hidden;background:#0b140e}
 .satellite-map{position:absolute;inset:0}.satellite-map .leaflet-control-zoom{left:16px;top:16px;margin:0}
 .leaflet-control-zoom a{width:42px!important;height:42px!important;line-height:42px!important;font-size:24px!important;color:#111!important;background:#f3f4ee!important}.leaflet-control-zoom a.leaflet-disabled{opacity:.28!important;cursor:not-allowed!important}
@@ -521,7 +522,7 @@ function startMode(modeId){
 function renderShell(){
 document.getElementById("app").innerHTML=`
 <main class="app"><header class="topbar"><div class="brand">TERRAIN</div><div class="round" id="roundText"></div><div class="hud-right"><div class="score">SCORE <strong id="scoreText">0</strong></div><button class="utility-btn compact about-game" data-info="how">HELP</button><button class="utility-btn compact" id="leaveGame">MODES</button></div></header>
-<section class="intro"><div class="eyebrow" id="category"></div><h1 id="clue">WHERE IN THE WORLD IS THIS?</h1><p>No clues before you guess. Study the shapes, textures and surrounding landscape, then place your pin on the world map.</p></section>
+<section class="intro"><div class="eyebrow" id="category"></div><h1 id="clue">WHERE IN THE WORLD IS THIS?</h1><p>Study the shapes, textures and surrounding landscape, then place your pin on the world map.</p><div class="clue-tools"><button class="clue-reveal" id="revealClue">REVEAL CLUE</button><p class="clue-text" id="clueText" hidden></p></div></section>
 <section class="game-stage" id="stage"><div id="satellite" class="satellite-map"></div>
 <div id="guessPanel" class="guess-panel"><div class="guess-map-header"><div><div class="eyebrow">GUESS MAP</div><div class="guess-status" id="guessStatus">PLACE YOUR GUESS</div></div><button class="map-toggle" id="toggleMap">EXPAND MAP ↗</button></div><div id="guessMap" class="guess-map"></div><div class="guess-attribution"><a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></div><button class="submit map-submit disabled" id="submit" disabled>LOCK IN GUESS <span>→</span></button></div>
 <div class="bottom-left"><div class="tip"><span>01</span><b>STUDY THE LANDSCAPE</b></div><div class="tip"><span>02</span><b>DROP YOUR PIN ON THE GUESS MAP</b></div></div>
@@ -529,6 +530,12 @@ document.getElementById("app").innerHTML=`
 document.getElementById("toggleMap").onclick=()=>{expanded=!expanded;document.getElementById("guessPanel").classList.toggle("expanded",expanded);document.getElementById("toggleMap").textContent=expanded?"MINIMIZE MAP ↙":"EXPAND MAP ↗";setTimeout(()=>guessMap.invalidateSize(),280)};
 document.getElementById("submit").onclick=submitGuess;
 document.getElementById("leaveGame").onclick=()=>{activeMode=null;renderMenu()};
+document.getElementById("revealClue").onclick=()=>{
+const clueText=document.getElementById("clueText");
+clueText.textContent=game[round].clue;
+clueText.hidden=false;
+document.getElementById("revealClue").hidden=true;
+};
 wireUtilityButtons();
 }
 
@@ -607,8 +614,11 @@ function renderRound(){
 const loc=game[round];guess=null;submitted=false;expanded=false;
 document.getElementById("roundText").textContent=`${activeMode.name} · ROUND ${String(round+1).padStart(2,"0")} / 06`;
 document.getElementById("scoreText").textContent=score.toLocaleString();
-document.getElementById("category").textContent=activeMode.name+" · NO CLUES";
 document.getElementById("clue").textContent="WHERE IN THE WORLD IS THIS?";
+document.getElementById("category").textContent=activeMode.name;
+document.getElementById("clueText").textContent="";
+document.getElementById("clueText").hidden=true;
+document.getElementById("revealClue").hidden=false;
 document.getElementById("guessStatus").textContent="PLACE YOUR GUESS";
 document.getElementById("guessPanel").classList.remove("expanded");
 document.getElementById("toggleMap").textContent="EXPAND MAP ↗";
