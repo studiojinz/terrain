@@ -661,11 +661,19 @@ if(answerMarker)answerMarker.remove();answerMarker=L.marker(loc.coords,{icon:ico
 if(line1)line1.remove();if(line2)line2.remove();
 line1=L.polyline([guess,loc.coords],{color:"#0a0f0c",weight:10,opacity:.95}).addTo(guessMap);
 line2=L.polyline([guess,loc.coords],{color:"#f5c542",weight:5,opacity:1,dashArray:"10 8"}).addTo(guessMap);
-const group=L.latLngBounds([guess,loc.coords]);guessMap.fitBounds(group,{padding:[90,90],maxZoom:5});
+const group=L.latLngBounds([guess,loc.coords]);
 expanded=true;document.getElementById("guessPanel").classList.add("expanded");document.getElementById("toggleMap").textContent="MINIMIZE MAP ↙";
-setTimeout(()=>guessMap.invalidateSize(),300);
-document.getElementById("result").innerHTML=`<div class="result-card"><div class="eyebrow">FIELD NOTE · ${esc(loc.category)}</div><h2>${esc(loc.name)}</h2><div class="result-stats"><div><span>DISTANCE TO CENTER</span><strong>${Math.round(km).toLocaleString()} km</strong></div><div><span>ROUND SCORE</span><strong>+${pts.toLocaleString()}</strong></div></div><p>${esc(loc.story)}</p><div class="hint-line"><b>What to notice:</b> ${esc(loc.hint)}</div>${round<5?'<button class="primary" id="nextBtn">NEXT ROUND →</button>':'<div class="final-note">Final round complete. Your expedition score is shown next.</div>'}</div>`;
-if(round<5)document.getElementById("nextBtn").onclick=nextRound;else setTimeout(showFinal,900);
+setTimeout(()=>{
+guessMap.invalidateSize();
+if(km<=250){
+const closeZoom=Math.min(14,guessMap.getBoundsZoom(group,false,[180,180]));
+guessMap.setView(group.getCenter(),closeZoom,{animate:true});
+}else{
+guessMap.fitBounds(group,{padding:[90,90],maxZoom:5});
+}
+},300);
+document.getElementById("result").innerHTML=`<div class="result-card"><div class="eyebrow">FIELD NOTE · ${esc(loc.category)}</div><h2>${esc(loc.name)}</h2><div class="result-stats"><div><span>DISTANCE TO CENTER</span><strong>${Math.round(km).toLocaleString()} km</strong></div><div><span>ROUND SCORE</span><strong>+${pts.toLocaleString()}</strong></div></div><p>${esc(loc.story)}</p><div class="hint-line"><b>What to notice:</b> ${esc(loc.hint)}</div>${round<5?'<button class="primary" id="nextBtn">NEXT ROUND →</button>':'<button class="primary" id="finishBtn">FINISH EXPEDITION →</button>'}</div>`;
+if(round<5)document.getElementById("nextBtn").onclick=nextRound;else document.getElementById("finishBtn").onclick=showFinal;
 }
 function nextRound(){round++;renderRound();}
 function showFinal(){
